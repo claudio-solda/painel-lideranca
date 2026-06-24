@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Painel de Gestão & Liderança</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #f4f6f9; color: #333; padding-bottom: 60px; }
+        header { background-color: #1e3a8a; color: white; padding: 20px 15px; text-align: center; }
+        header h1 { font-size: 1.4rem; margin-bottom: 5px; }
+        header p { font-size: 0.85rem; opacity: 0.9; }
+        .nav-tabs { display: flex; background-color: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .tab-btn { flex: 1; padding: 15px 5px; text-align: center; background: none; border: none; font-size: 0.9rem; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; cursor: pointer; }
+        .tab-btn.active { color: #1e3a8a; border-bottom-color: #1e3a8a; }
+        .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        .card h2 { font-size: 1.1rem; color: #1e3a8a; margin-bottom: 12px; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; background-color: #f8fafc; }
+        button.btn-primary { width: 100%; background-color: #1e3a8a; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .script-box { background-color: #f8fafc; border-left: 4px solid #1e3a8a; padding: 12px; border-radius: 0 8px 8px 0; font-size: 0.95rem; line-height: 1.5; white-space: pre-line; margin-top: 15px; display: none; }
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
+        .checkbox-group input { width: auto; margin-top: 3px; }
+        .badge { background-color: #e2e8f0; color: #334155; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .badge.red { background-color: #ffeeec; color: #dc2626; }
+        .badge.green { background-color: #f0fdf4; color: #16a34a; }
+        .team-member-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Painel de Gestão & Liderança</h1>
+        <p>Ferramenta de Apoio Prático para Líderes</p>
+    </header>
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-feedback', this)">💬 Feedback</button>
+        <button class="tab-btn" onclick="switchTab('tab-engajamento', this)">🚀 Engajamento</button>
+        <button class="tab-btn" onclick="switchTab('tab-equipe', this)">👥 Minha Equipe</button>
+    </div>
+    <div class="container">
+        <div id="tab-feedback" class="tab-content active">
+            <div class="card">
+                <h2>Roteiro de Feedback Construtivo</h2>
+                <label for="fb-nome">Nome do Colaborador:</label>
+                <input type="text" id="fb-nome" placeholder="Ex: João Silva">
+                <label for="fb-ponto-forte">Ponto Forte:</label>
+                <input type="text" id="fb-ponto-forte" placeholder="Ex: dedicação com a equipe">
+                <label for="fb-meta-abaixo">O que não está atingindo?:</label>
+                <input type="text" id="fb-meta-abaixo" placeholder="Ex: as metas de entregas">
+                <label for="fb-sugestao">Ação corretiva sugerida:</label>
+                <input type="text" id="fb-sugestao" placeholder="Ex: revisar o cronograma diário">
+                <button class="btn-primary" onclick="gerarRoteiro()">Gerar Roteiro</button>
+                <div id="resultado-script" class="script-box"></div>
+            </div>
+        </div>
+        <div id="tab-engajamento" class="tab-content">
+            <div class="card">
+                <h2>Ações Práticas para Trabalho Remoto</h2>
+                <div class="checkbox-group"><input type="checkbox"> <span><strong>☕ Café Virtual:</strong> Encontro semanal descontraído da equipe.</span></div>
+                <div class="checkbox-group"><input type="checkbox"> <span><strong>⏱️ Dailies:</strong> Alinhamentos rápidos diários de 10 min.</span></div>
+                <div class="checkbox-group"><input type="checkbox"> <span><strong>👏 Reconhecimento:</strong> Elogiar publicamente um membro.</span></div>
+            </div>
+        </div>
+        <div id="tab-equipe" class="tab-content">
+            <div class="card">
+                <h2>Acompanhamento da Equipe</h2>
+                <div id="lista-equipe">
+                    <div class="team-member-item"><div><strong>Colaborador Exemplo</strong><br><span style="font-size:0.8rem;color:#64748b;">Meta: 75% acertos</span></div><span class="badge red">Atenção</span></div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Adicionar Novo Membro</h2>
+                <input type="text" id="eq-nome" placeholder="Nome">
+                <input type="text" id="eq-meta" placeholder="Meta Principal">
+                <select id="eq-status"><option value="Engajado">Engajado 👍</option><option value="Atenção">Atenção ⚠️</option></select>
+                <button class="btn-primary" onclick="adicionarMembro()">Salvar na Lista</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+        function gerarRoteiro() {
+            const n = document.getElementById('fb-nome').value || '[Nome]';
+            const p = document.getElementById('fb-ponto-forte').value || '[ponto forte]';
+            const m = document.getElementById('fb-meta-abaixo').value || '[metas]';
+            const s = document.getElementById('fb-sugestao').value || '[sugestão]';
+            const box = document.getElementById('resultado-script');
+            box.innerHTML = `<strong>ROTEIRO PARA ${n.toUpperCase()}:</strong><br><br>🗣️ <strong>1. Início:</strong> "Olá ${n}, queremos pensar juntos em como te apoiar nas metas."<br><br>🌟 <strong>2. Elogio:</strong> "Valorizo sua <u>${p}</u>."<br><br>⚠️ <strong>3. Crítica:</strong> "Notamos que ficou abaixo em: <u>${m}</u>. Teve alguma dificuldade?"<br><br>🛠️ <strong>4. Plano:</strong> "Sugiro focarmos em <u>${s}</u>. Como posso ajudar?"`;
+            box.style.display = 'block';
+        }
+        function adicionarMembro() {
+            const n = document.getElementById('eq-nome').value;
+            const m = document.getElementById('eq-meta').value;
+            const s = document.getElementById('eq-status').value;
+            if(!n || !m) return;
+            const l = document.getElementById('lista-equipe');
+            const c = s === 'Engajado' ? 'green' : 'red';
+            const item = document.createElement('div');
+            item.className = 'team-member-item';
+            item.innerHTML = `<div><strong>${n}</strong><br><span style="font-size:0.8rem;color:#64748b;">Meta: ${m}</span></div><span class="badge ${c}">${s}</span>`;
+            l.appendChild(item);
+            document.getElementById('eq-nome').value = ''; document.getElementById('eq-meta').value = '';
+        }
+    </script>
+</body>
+</html>
