@@ -525,6 +525,15 @@
       <select id="oee-op">
         <option value="">— Selecione o operador —</option>
       </select>
+      <label>Máquina</label>
+      <select id="oee-maquina">
+        <option value="">— Selecione a máquina —</option>
+        <option>MS001</option><option>MS002</option><option>MS003</option><option>MS004</option>
+        <option>MS005</option><option>MS006</option><option>MS007</option><option>MS008</option>
+        <option>MS009</option><option>MS010</option><option>MS011</option><option>MS012</option>
+        <option>MS013</option><option>MS014</option><option>MS015</option>
+        <option>Rebitadeira</option><option>Robô</option><option>Montagem 1</option><option>Montagem 2</option>
+      </select>
       <label>Turno</label>
       <select id="oee-turno">
         <option value="1">Turno 1</option>
@@ -821,6 +830,7 @@ function popularSelectOp() {
 
 function salvarOEE() {
   const op = document.getElementById('oee-op').value;
+  const maquina = document.getElementById('oee-maquina').value;
   const turno = document.getElementById('oee-turno').value;
   const data = document.getElementById('oee-data').value;
   const valor = parseFloat(document.getElementById('oee-valor').value);
@@ -829,10 +839,10 @@ function salvarOEE() {
   const qualidade = document.getElementById('oee-qualidade').value;
   const obs = document.getElementById('oee-obs').value.trim();
 
-  if (!op || !data || isNaN(valor)) { alert('Preencha operador, data e OEE.'); return; }
+  if (!op || !maquina || !data || isNaN(valor)) { alert('Preencha operador, máquina, data e OEE.'); return; }
   if (valor < 0 || valor > 100) { alert('OEE deve ser entre 0 e 100.'); return; }
 
-  oeeRegistros.push({ op, turno, data, valor, pecas, parada, qualidade, obs, ts: Date.now() });
+  oeeRegistros.push({ op, maquina, turno, data, valor, pecas, parada, qualidade, obs, ts: Date.now() });
   localStorage.setItem('pl_oee', JSON.stringify(oeeRegistros));
   renderOEELista();
   atualizarStatsOEE();
@@ -964,7 +974,7 @@ function abrirDetalhe(nomeOp) {
         <span class="det-reg-date">${dataFmt}</span>
       </div>
       <div class="det-reg-body">
-        🔧 ${r.pecas} peças · ⏱️ ${r.parada}min parada · ✅ Qualidade: ${r.qualidade}
+        🏭 ${r.maquina || '—'} · 🔧 ${r.pecas} peças · ⏱️ ${r.parada}min parada · ✅ Qualidade: ${r.qualidade}
         ${r.obs ? '<br>📝 ' + r.obs : ''}
       </div>`;
     hist.appendChild(d);
