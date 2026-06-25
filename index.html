@@ -369,6 +369,27 @@
   .det-reg-title { font-weight: 700; font-size: 0.82rem; }
   .det-reg-date { font-size: 0.72rem; color: var(--muted); }
   .det-reg-body { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .lote-row {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1.5px solid var(--border);
+  }
+  .lote-row-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .lote-avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.72rem;
+  }
+  .lote-nome { font-weight: 700; font-size: 0.85rem; flex: 1; }
+  .lote-fields { display: flex; gap: 6px; }
+  .lote-fields input, .lote-fields select {
+    flex: 1; padding: 7px 8px; font-size: 0.8rem; margin-bottom: 0;
+  }
 </style>
 </head>
 <body>
@@ -521,43 +542,72 @@
     <!-- Lançar registro -->
     <div class="card">
       <div class="card-title"><div class="icon">➕</div> Lançar Registro de OEE</div>
-      <label>Operador</label>
-      <select id="oee-op">
-        <option value="">— Selecione o operador —</option>
-      </select>
-      <label>Máquina</label>
-      <select id="oee-maquina">
-        <option value="">— Selecione a máquina —</option>
-        <option>MS001</option><option>MS002</option><option>MS003</option><option>MS004</option>
-        <option>MS005</option><option>MS006</option><option>MS007</option><option>MS008</option>
-        <option>MS009</option><option>MS010</option><option>MS011</option><option>MS012</option>
-        <option>MS013</option><option>MS014</option><option>MS015</option>
-        <option>Rebitadeira</option><option>Robô</option><option>Montagem 1</option><option>Montagem 2</option>
-      </select>
-      <label>Turno</label>
-      <select id="oee-turno">
-        <option value="1">Turno 1</option>
-        <option value="2">Turno 2</option>
-        <option value="3">Turno 3</option>
-      </select>
-      <label>Data</label>
-      <input type="date" id="oee-data">
-      <label>OEE (%)</label>
-      <input type="number" id="oee-valor" placeholder="Ex: 78" min="0" max="100">
-      <label>Peças produzidas</label>
-      <input type="number" id="oee-pecas" placeholder="Ex: 1450">
-      <label>Tempo de parada (min)</label>
-      <input type="number" id="oee-parada" placeholder="Ex: 35">
-      <label>Qualidade da solda</label>
-      <select id="oee-qualidade">
-        <option value="Ótima">Ótima ✅</option>
-        <option value="Boa">Boa 👍</option>
-        <option value="Regular">Regular ⚠️</option>
-        <option value="Ruim">Ruim 🔴</option>
-      </select>
-      <label>Observações do setup</label>
-      <textarea id="oee-obs" placeholder="Ex: Ajuste de pressão, troca de eletrodo, problema no alimentador..."></textarea>
-      <button class="btn-primary" onclick="salvarOEE()">💾 Salvar Registro</button>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="btn-outline" style="flex:1;padding:10px;" onclick="mostrarModoLote(false)" id="btn-modo-individual">👤 Individual</button>
+        <button class="btn-primary" style="flex:1;padding:10px;" onclick="mostrarModoLote(true)" id="btn-modo-lote">⚡ Lote (todos)</button>
+      </div>
+
+      <!-- MODO INDIVIDUAL -->
+      <div id="modo-individual">
+        <label>Operador</label>
+        <select id="oee-op">
+          <option value="">— Selecione o operador —</option>
+        </select>
+        <label>Máquina</label>
+        <select id="oee-maquina">
+          <option value="">— Selecione a máquina —</option>
+          <option>MS001</option><option>MS002</option><option>MS003</option><option>MS004</option>
+          <option>MS005</option><option>MS006</option><option>MS007</option><option>MS008</option>
+          <option>MS009</option><option>MS010</option><option>MS011</option><option>MS012</option>
+          <option>MS013</option><option>MS014</option><option>MS015</option>
+          <option>Rebitadeira</option><option>Robô</option><option>Montagem 1</option><option>Montagem 2</option>
+        </select>
+        <label>Turno</label>
+        <select id="oee-turno">
+          <option value="1">Turno 1</option>
+          <option value="2">Turno 2</option>
+          <option value="3">Turno 3</option>
+        </select>
+        <label>Data</label>
+        <input type="date" id="oee-data">
+        <label>OEE (%)</label>
+        <input type="number" id="oee-valor" placeholder="Ex: 78" min="0" max="100">
+        <label>Peças produzidas</label>
+        <input type="number" id="oee-pecas" placeholder="Ex: 1450">
+        <label>Tempo de parada (min)</label>
+        <input type="number" id="oee-parada" placeholder="Ex: 35">
+        <label>Qualidade da solda</label>
+        <select id="oee-qualidade">
+          <option value="Ótima">Ótima ✅</option>
+          <option value="Boa">Boa 👍</option>
+          <option value="Regular">Regular ⚠️</option>
+          <option value="Ruim">Ruim 🔴</option>
+        </select>
+        <label>Observações do setup</label>
+        <textarea id="oee-obs" placeholder="Ex: Ajuste de pressão, troca de eletrodo, problema no alimentador..."></textarea>
+        <button class="btn-primary" onclick="salvarOEE()">💾 Salvar Registro</button>
+      </div>
+
+      <!-- MODO LOTE -->
+      <div id="modo-lote" style="display:none;">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <label>Data</label>
+            <input type="date" id="lote-data">
+          </div>
+          <div style="flex:1;">
+            <label>Turno</label>
+            <select id="lote-turno">
+              <option value="1">Turno 1</option>
+              <option value="2">Turno 2</option>
+              <option value="3">Turno 3</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Preencha OEE e máquina de cada operador. Campos em branco serão ignorados.</div>
+        <div id="lote-lista"></div>
+        <button class="btn-primary" onclick="salvarLote()" style="margin-top:8px;">💾 Salvar Todos</button>
+      </div>
     </div>
 
     <!-- Lista operadores com OEE -->
@@ -988,11 +1038,77 @@ function fecharDetalhe() {
   document.getElementById('oee-detalhe').style.display = 'none';
 }
 
+// ======= LOTE =======
+const MAQUINAS = ['MS001','MS002','MS003','MS004','MS005','MS006','MS007','MS008',
+  'MS009','MS010','MS011','MS012','MS013','MS014','MS015','Rebitadeira','Robô','Montagem 1','Montagem 2'];
+
+function mostrarModoLote(lote) {
+  document.getElementById('modo-individual').style.display = lote ? 'none' : 'block';
+  document.getElementById('modo-lote').style.display = lote ? 'block' : 'none';
+  document.getElementById('btn-modo-individual').className = lote ? 'btn-outline' : 'btn-primary';
+  document.getElementById('btn-modo-lote').className = lote ? 'btn-primary' : 'btn-outline';
+  if (lote) renderLoteLista();
+}
+
+function renderLoteLista() {
+  const cont = document.getElementById('lote-lista');
+  cont.innerHTML = '';
+  if (equipe.length === 0) {
+    cont.innerHTML = '<div class="empty-state"><p>Cadastre operadores na aba Equipe primeiro.</p></div>';
+    return;
+  }
+  equipe.forEach((m, i) => {
+    const initials = m.nome.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const optsM = MAQUINAS.map(mq => `<option>${mq}</option>`).join('');
+    const div = document.createElement('div');
+    div.className = 'lote-row';
+    div.innerHTML = `
+      <div class="lote-row-header">
+        <div class="lote-avatar">${initials}</div>
+        <span class="lote-nome">${m.nome}</span>
+      </div>
+      <div class="lote-fields">
+        <select id="lote-maq-${i}" style="flex:1.2;">
+          <option value="">Máquina</option>${optsM}
+        </select>
+        <input type="number" id="lote-oee-${i}" placeholder="OEE %" min="0" max="100" style="flex:0.8;">
+        <input type="number" id="lote-pecas-${i}" placeholder="Peças" style="flex:0.8;">
+      </div>`;
+    cont.appendChild(div);
+  });
+}
+
+function salvarLote() {
+  const data = document.getElementById('lote-data').value;
+  const turno = document.getElementById('lote-turno').value;
+  if (!data) { alert('Informe a data.'); return; }
+
+  let salvos = 0;
+  equipe.forEach((m, i) => {
+    const maquina = document.getElementById(`lote-maq-${i}`)?.value;
+    const oeeVal = document.getElementById(`lote-oee-${i}`)?.value;
+    const pecas = parseInt(document.getElementById(`lote-pecas-${i}`)?.value) || 0;
+    if (!oeeVal || !maquina) return; // pula se não preenchido
+    const valor = parseFloat(oeeVal);
+    if (isNaN(valor) || valor < 0 || valor > 100) return;
+    oeeRegistros.push({ op: m.nome, maquina, turno, data, valor, pecas, parada: 0, qualidade: 'Boa', obs: '', ts: Date.now() });
+    salvos++;
+  });
+
+  if (salvos === 0) { alert('Preencha pelo menos um operador.'); return; }
+  localStorage.setItem('pl_oee', JSON.stringify(oeeRegistros));
+  renderOEELista();
+  atualizarStatsOEE();
+  renderLoteLista(); // limpa campos
+  alert(`✅ ${salvos} registro(s) salvos!`);
+}
+
 // ======= INIT =======
 function init() {
   // data padrão = hoje
   const hoje = new Date().toISOString().split('T')[0];
   document.getElementById('oee-data').value = hoje;
+  document.getElementById('lote-data').value = hoje;
 
   renderChecklist(SEMANAL, checksSemanal, 'checklist-semanal', 'prog-semanal', 'prog-label-semanal', 'pl_semanal');
   renderChecklist(PRATICAS, checksPraticas, 'checklist-praticas', 'prog-praticas', 'prog-label-praticas', 'pl_praticas');
