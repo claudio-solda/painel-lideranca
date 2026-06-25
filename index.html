@@ -324,6 +324,51 @@
 
   /* GOLD DIVIDER */
   .gold-divider { height: 2px; background: linear-gradient(90deg, var(--gold), transparent); border-radius: 99px; margin: 14px 0; }
+  /* OEE */
+  input[type=number], input[type=date] {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.92rem;
+    font-family: 'Inter', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+  }
+  .op-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .op-row:last-child { border-bottom: none; }
+  .op-row:hover { background: var(--surface); border-radius: 8px; padding-left: 6px; }
+  .op-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+    color: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.8rem;
+  }
+  .op-info { flex: 1; }
+  .op-name { font-weight: 600; font-size: 0.88rem; }
+  .op-sub { font-size: 0.72rem; color: var(--muted); }
+  .oee-pill {
+    padding: 4px 10px; border-radius: 99px;
+    font-size: 0.78rem; font-weight: 700; min-width: 52px; text-align: center;
+  }
+  .oee-pill.verde { background: var(--green-bg); color: var(--green); }
+  .oee-pill.amarelo { background: var(--yellow-bg); color: var(--yellow); }
+  .oee-pill.vermelho { background: var(--red-bg); color: var(--red); }
+  .oee-pill.sem { background: var(--border); color: var(--muted); }
+  .bar-item { flex: 1; border-radius: 4px 4px 0 0; min-width: 8px; position: relative; cursor: pointer; }
+  .det-reg {
+    background: var(--surface); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px;
+    border-left: 3px solid var(--navy-mid);
+  }
+  .det-reg-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .det-reg-title { font-weight: 700; font-size: 0.82rem; }
+  .det-reg-date { font-size: 0.72rem; color: var(--muted); }
+  .det-reg-body { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -346,6 +391,9 @@
   </button>
   <button class="tab-btn" onclick="switchTab('tab-historico', this)">
     <span class="tab-icon">📋</span>Histórico
+  </button>
+  <button class="tab-btn" onclick="switchTab('tab-oee', this)">
+    <span class="tab-icon">📊</span>OEE
   </button>
 </div>
 
@@ -451,6 +499,88 @@
     </div>
   </div>
 
+  <!-- TAB OEE -->
+  <div id="tab-oee" class="tab-content">
+
+    <!-- Resumo geral -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="oee-media">—</div>
+        <div class="stat-lbl">OEE Médio</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="oee-abaixo" style="color:var(--red)">0</div>
+        <div class="stat-lbl">Abaixo 75%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="oee-acima" style="color:var(--green)">0</div>
+        <div class="stat-lbl">Acima 85%</div>
+      </div>
+    </div>
+
+    <!-- Lançar registro -->
+    <div class="card">
+      <div class="card-title"><div class="icon">➕</div> Lançar Registro de OEE</div>
+      <label>Operador</label>
+      <select id="oee-op">
+        <option value="">— Selecione o operador —</option>
+      </select>
+      <label>Turno</label>
+      <select id="oee-turno">
+        <option value="1">Turno 1</option>
+        <option value="2">Turno 2</option>
+        <option value="3">Turno 3</option>
+      </select>
+      <label>Data</label>
+      <input type="date" id="oee-data">
+      <label>OEE (%)</label>
+      <input type="number" id="oee-valor" placeholder="Ex: 78" min="0" max="100">
+      <label>Peças produzidas</label>
+      <input type="number" id="oee-pecas" placeholder="Ex: 1450">
+      <label>Tempo de parada (min)</label>
+      <input type="number" id="oee-parada" placeholder="Ex: 35">
+      <label>Qualidade da solda</label>
+      <select id="oee-qualidade">
+        <option value="Ótima">Ótima ✅</option>
+        <option value="Boa">Boa 👍</option>
+        <option value="Regular">Regular ⚠️</option>
+        <option value="Ruim">Ruim 🔴</option>
+      </select>
+      <label>Observações do setup</label>
+      <textarea id="oee-obs" placeholder="Ex: Ajuste de pressão, troca de eletrodo, problema no alimentador..."></textarea>
+      <button class="btn-primary" onclick="salvarOEE()">💾 Salvar Registro</button>
+    </div>
+
+    <!-- Lista operadores com OEE -->
+    <div class="card">
+      <div class="card-title"><div class="icon">👷</div> Desempenho por Operador</div>
+      <div style="margin-bottom:10px;">
+        <input type="text" id="oee-busca" placeholder="🔍 Buscar operador..." style="margin-bottom:0;" oninput="filtrarOperadores()">
+      </div>
+      <div id="oee-lista-ops"></div>
+    </div>
+
+    <!-- Detalhe operador (modal simples) -->
+    <div id="oee-detalhe" style="display:none;">
+      <div class="card" style="border:2px solid var(--navy);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title" style="margin-bottom:0;"><div class="icon">📈</div> <span id="det-nome">—</span></div>
+          <button class="btn-outline" onclick="fecharDetalhe()">✕ Fechar</button>
+        </div>
+        <div class="stats-row" style="margin-bottom:14px;">
+          <div class="stat-box"><div class="stat-num" id="det-oee">—</div><div class="stat-lbl">OEE Médio</div></div>
+          <div class="stat-box"><div class="stat-num" id="det-pecas">—</div><div class="stat-lbl">Peças Total</div></div>
+          <div class="stat-box"><div class="stat-num" id="det-registros">—</div><div class="stat-lbl">Registros</div></div>
+        </div>
+        <!-- mini gráfico de barras -->
+        <div class="section-label">Últimos registros</div>
+        <div id="det-grafico" style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:6px;"></div>
+        <div id="det-historico"></div>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
@@ -553,6 +683,8 @@ function adicionarMembro() {
   equipe.push({ nome, cargo, meta, status });
   localStorage.setItem('pl_equipe', JSON.stringify(equipe));
   renderEquipe();
+  popularSelectOp();
+  renderOEELista();
   atualizarStats();
   document.getElementById('eq-nome').value = '';
   document.getElementById('eq-cargo').value = '';
@@ -672,12 +804,193 @@ Use linguagem natural, brasileira e profissional. Inclua frases de exemplo para 
   }
 }
 
+// ======= OEE =======
+let oeeRegistros = JSON.parse(localStorage.getItem('pl_oee') || '[]');
+
+function popularSelectOp() {
+  const sel = document.getElementById('oee-op');
+  // limpa e repopula com equipe cadastrada
+  sel.innerHTML = '<option value="">— Selecione o operador —</option>';
+  equipe.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.nome;
+    opt.textContent = m.nome + (m.cargo ? ` (${m.cargo})` : '');
+    sel.appendChild(opt);
+  });
+}
+
+function salvarOEE() {
+  const op = document.getElementById('oee-op').value;
+  const turno = document.getElementById('oee-turno').value;
+  const data = document.getElementById('oee-data').value;
+  const valor = parseFloat(document.getElementById('oee-valor').value);
+  const pecas = parseInt(document.getElementById('oee-pecas').value) || 0;
+  const parada = parseInt(document.getElementById('oee-parada').value) || 0;
+  const qualidade = document.getElementById('oee-qualidade').value;
+  const obs = document.getElementById('oee-obs').value.trim();
+
+  if (!op || !data || isNaN(valor)) { alert('Preencha operador, data e OEE.'); return; }
+  if (valor < 0 || valor > 100) { alert('OEE deve ser entre 0 e 100.'); return; }
+
+  oeeRegistros.push({ op, turno, data, valor, pecas, parada, qualidade, obs, ts: Date.now() });
+  localStorage.setItem('pl_oee', JSON.stringify(oeeRegistros));
+  renderOEELista();
+  atualizarStatsOEE();
+
+  // limpar campos
+  document.getElementById('oee-valor').value = '';
+  document.getElementById('oee-pecas').value = '';
+  document.getElementById('oee-parada').value = '';
+  document.getElementById('oee-obs').value = '';
+  alert('✅ Registro salvo!');
+}
+
+function corOEE(v) {
+  if (v >= 85) return 'verde';
+  if (v >= 75) return 'amarelo';
+  return 'vermelho';
+}
+
+function corHex(v) {
+  if (v >= 85) return '#059669';
+  if (v >= 75) return '#d97706';
+  return '#dc2626';
+}
+
+function atualizarStatsOEE() {
+  if (oeeRegistros.length === 0) {
+    document.getElementById('oee-media').textContent = '—';
+    document.getElementById('oee-abaixo').textContent = '0';
+    document.getElementById('oee-acima').textContent = '0';
+    return;
+  }
+  // média por operador (último registro de cada)
+  const porOp = {};
+  oeeRegistros.forEach(r => {
+    if (!porOp[r.op]) porOp[r.op] = [];
+    porOp[r.op].push(r.valor);
+  });
+  const medias = Object.values(porOp).map(arr => arr.reduce((a,b)=>a+b,0)/arr.length);
+  const media = medias.reduce((a,b)=>a+b,0)/medias.length;
+  document.getElementById('oee-media').textContent = media.toFixed(0) + '%';
+  document.getElementById('oee-abaixo').textContent = medias.filter(v=>v<75).length;
+  document.getElementById('oee-acima').textContent = medias.filter(v=>v>=85).length;
+}
+
+function renderOEELista(filtro='') {
+  const lista = document.getElementById('oee-lista-ops');
+  // montar mapa de operadores com dados
+  const porOp = {};
+  equipe.forEach(m => { porOp[m.nome] = { nome: m.nome, cargo: m.cargo, registros: [] }; });
+  oeeRegistros.forEach(r => {
+    if (!porOp[r.op]) porOp[r.op] = { nome: r.op, cargo: '', registros: [] };
+    porOp[r.op].registros.push(r);
+  });
+
+  const ops = Object.values(porOp).filter(o =>
+    !filtro || o.nome.toLowerCase().includes(filtro.toLowerCase())
+  ).sort((a,b) => {
+    // sem dados vai pro final; com dados ordena por OEE médio crescente (piores primeiro)
+    const ma = a.registros.length ? a.registros.reduce((s,r)=>s+r.valor,0)/a.registros.length : 999;
+    const mb = b.registros.length ? b.registros.reduce((s,r)=>s+r.valor,0)/b.registros.length : 999;
+    return ma - mb;
+  });
+
+  if (ops.length === 0) {
+    lista.innerHTML = '<div class="empty-state"><div class="empty-icon">👷</div><p>Nenhum operador encontrado.<br>Adicione membros na aba Equipe.</p></div>';
+    return;
+  }
+
+  lista.innerHTML = '';
+  ops.forEach(op => {
+    const regs = op.registros;
+    const media = regs.length ? (regs.reduce((s,r)=>s+r.valor,0)/regs.length).toFixed(0) : null;
+    const initials = op.nome.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const cor = media !== null ? corOEE(parseFloat(media)) : 'sem';
+    const pill = media !== null ? media + '%' : 'Sem dados';
+
+    const div = document.createElement('div');
+    div.className = 'op-row';
+    div.innerHTML = `
+      <div class="op-avatar">${initials}</div>
+      <div class="op-info">
+        <div class="op-name">${op.nome}</div>
+        <div class="op-sub">${op.cargo || 'Operador'} · ${regs.length} registro(s)</div>
+      </div>
+      <span class="oee-pill ${cor}">${pill}</span>
+      <span style="color:var(--muted);font-size:1rem;">›</span>`;
+    div.onclick = () => abrirDetalhe(op.nome);
+    lista.appendChild(div);
+  });
+}
+
+function filtrarOperadores() {
+  const filtro = document.getElementById('oee-busca').value;
+  renderOEELista(filtro);
+}
+
+function abrirDetalhe(nomeOp) {
+  const regs = oeeRegistros.filter(r => r.op === nomeOp).sort((a,b)=>new Date(b.data)-new Date(a.data));
+  document.getElementById('det-nome').textContent = nomeOp;
+  const media = regs.length ? (regs.reduce((s,r)=>s+r.valor,0)/regs.length).toFixed(1) : '—';
+  const totalPecas = regs.reduce((s,r)=>s+r.pecas,0);
+  document.getElementById('det-oee').textContent = media !== '—' ? media + '%' : '—';
+  document.getElementById('det-pecas').textContent = totalPecas.toLocaleString('pt-BR');
+  document.getElementById('det-registros').textContent = regs.length;
+
+  // mini gráfico
+  const graf = document.getElementById('det-grafico');
+  graf.innerHTML = '';
+  const ultimos = [...regs].reverse().slice(-10);
+  ultimos.forEach(r => {
+    const bar = document.createElement('div');
+    bar.className = 'bar-item';
+    bar.style.height = r.valor + '%';
+    bar.style.background = corHex(r.valor);
+    bar.title = r.data + ': ' + r.valor + '%';
+    graf.appendChild(bar);
+  });
+
+  // histórico
+  const hist = document.getElementById('det-historico');
+  hist.innerHTML = '';
+  regs.slice(0,8).forEach(r => {
+    const d = document.createElement('div');
+    d.className = 'det-reg';
+    const dataFmt = r.data ? new Date(r.data + 'T12:00:00').toLocaleDateString('pt-BR') : '';
+    d.innerHTML = `
+      <div class="det-reg-header">
+        <span class="det-reg-title">Turno ${r.turno} · OEE: <span style="color:${corHex(r.valor)}">${r.valor}%</span></span>
+        <span class="det-reg-date">${dataFmt}</span>
+      </div>
+      <div class="det-reg-body">
+        🔧 ${r.pecas} peças · ⏱️ ${r.parada}min parada · ✅ Qualidade: ${r.qualidade}
+        ${r.obs ? '<br>📝 ' + r.obs : ''}
+      </div>`;
+    hist.appendChild(d);
+  });
+
+  document.getElementById('oee-detalhe').style.display = 'block';
+  document.getElementById('oee-detalhe').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function fecharDetalhe() {
+  document.getElementById('oee-detalhe').style.display = 'none';
+}
+
 // ======= INIT =======
 function init() {
+  // data padrão = hoje
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('oee-data').value = hoje;
+
   renderChecklist(SEMANAL, checksSemanal, 'checklist-semanal', 'prog-semanal', 'prog-label-semanal', 'pl_semanal');
   renderChecklist(PRATICAS, checksPraticas, 'checklist-praticas', 'prog-praticas', 'prog-label-praticas', 'pl_praticas');
   renderEquipe();
   renderHistorico();
+  popularSelectOp();
+  renderOEELista();
+  atualizarStatsOEE();
   atualizarStats();
 }
 
